@@ -1,0 +1,119 @@
+Receiver
+Receiver APP is the app that will run on all devices. This is controlled by the Sender APP in the Chromecast case.
+
+Receiver Imports
+<script src="//www.gstatic.com/cast/sdk/libs/receiver/2.0.0/cast_receiver.js"></script>
+	<script type="text/javascript" src="../engine/engine-base.js"></script>
+  	<script type="text/javascript" src="../engine/engine-receiver.js"></script>
+
+Receiver Configuration
+Enable input for different devices
+
+Example:
+	<script> 
+		WEB_CHROME_CAST = true;	//for Cromecast enable (sender)
+		WEB_CHROME_PC = true;	//for pc input enable
+</script> 
+
+Receiver Initialize
+It’s simple, you have to initialize into window onload event. loadEngine(CANVAS_HTML_TAG_ID) function initialize the receiver with the necessary functionality for the different devices, if you use loadEngineDefault() you have to use 'canvas-chromecast' ID for the canvas HTML5 tag.
+
+loadEngine('CANVAS_ID');
+loadEngineDefault(); 	//Canvas ID default 'canvas-chromecast'
+
+In addition, you have to load all the resources (from resources folder) before the app logic, so you can loadImage(RES_NAME) or loadJSON(RES_NAME). It’s easy RES_NAME must be only the name of the file, without the extension. 
+
+var img_reference = loadImage(‘coin-sprite’);		// domain.com/resources/coin-sprite.png
+var img_reference = loadImageFormat(‘coin-sprite’, ‘PNG’)	// domain.com/resources/coin-sprite.png
+var json_reference = loadJSON(‘map’);			// domain.com/resources/map.json
+
+Is very important override any events that will provide you the times to work.
+var input = function(){};		-	for calculate input keys, touch, or chromecast sender.
+var update = function(){};		-	for calculate coordinates, and game or canvas logic.
+var load = function(){};		-	this event is handled when all resources have been loaded
+
+Example:
+	<script> 
+window.onload = function() {
+			loadEngineDefault();			
+var imgcoin = loadImage("coin-sprite");
+}
+</script> 
+
+Receiver Body
+In the receiver body is completely mandatory add an HTML5 Canvas. Chromecast is an HD device, so the resolution is 720.
+
+<body style="background-color: black;">
+	<canvas id="canvas-chromecast" width="1280" height="720"/>
+</body>
+
+Receiver Objects and Groups
+This is the most important part, the canvas objects and groups, whose names say everything, it’s simple with the next example you will understand each of them.
+
+new SpriteElement(image, x, y, frames);			-	Sprite animation HORIZONTAL
+new ImageSplitElement(image, x, y, framesx, framesy, fx, fy);	-	Split XY extraction part of image
+new ImageElement(image, x, y);				-	Simple complete Image Element
+new CircleElement(x, y, radio, color);				-	Simple Cirle
+new TextElement(x, y, text, size, color);			-	Simple Text
+new RectLinedElement(x, y, width, height, color, linecolor);		-	Rect with lined Bounds
+new LineElement(x, y, width, height, color);			-	Simple Line
+new RectElement(x, y, width, height, color);			-	Simple Rect
+new GroupElement(_x, _y);					-	Group container of elements or other groups
+
+Stage and groups
+you can add elements or groups to stages or other groups very simply
+this.add(ELEMENT_OR_GROUP)
+
+Common properties
+this.setX		-	Set X
+this.setY		-	Set Y
+this.setZ		-	Rendering order Z
+this.getX		-	Get X
+this.getY		-	Get Y
+this.plusX		-	Plus coordinates
+this.plusY	-	Plus coordinates
+this.setVisibility	-	Rendering visibility
+this.remove	-	Remove from Parent
+
+Example:
+<script> 
+		var background = new RectElement(0, 0, 1280, 720, 'red');
+						
+var group = new GroupElement(10, 10);
+		var test = new SpriteElement(img_reference , 0, 0, 10);
+		group.add(test);
+						
+		add(background);
+		add(group);
+	</script> 
+
+Collisions
+This is the most useful part on games, where elementA and elementB can be Elements or Groups and x y is the new plus position of each Element. 
+
+intersect(elementA, elementB) - bool
+tryIntersect(elementA, _x, _y, elementB) - bool
+tryIntersectComplex(elementA, _x, _y, elementB, _x2, _y2) - bool
+
+Generally we use it with plusX/plusY function, because tryIntersect Check if its posibble make a plus without intersect before the element move.
+
+Example:
+	if(!tryIntersect(group1, 0, -2, group2)) group1.plusY(-2);
+
+Input
+On Chromecast we have the possibility of receive different information, messages, or json objects, but by default we have a common array keysDown which have al the keyboard event, it work on PC, and by sender to Chromecast, it’s the same.
+You have to compare with the different key codes
+
+KEY_NUMS.UP
+KEY_NUMS.DOWN
+KEY_NUMS.LEFT
+KEY_NUMS.RIGHT
+
+Example
+input = function(){		
+	if (KEY_NUMS.UP in keysDown) { //UP
+		if(!tryIntersect(group1, 0, -2, group2)) group1.plusY(-2);
+	}			
+	if (KEY_NUMS.DOWN in keysDown) { //DOWN
+		if(!tryIntersect(group1, 0, 2, group2)) group1.plusY(2);
+	}
+}
