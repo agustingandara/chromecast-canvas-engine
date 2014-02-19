@@ -1,0 +1,17 @@
+#labels ftp,structure
+Chromecast Engine Canvas
+This micro API is specialized to make easier the 2D Job. It resolve objects types, collisions, groups, resources, and have a lot of game and canvas 2D functionality. The main purpose is make easier Chromecast Canvas APP’s, but obviously it run also on any device compatible with chrome engine.
+
+FTP Structure
+The structure is very simple.
+The folder “engine” is the container of the API files, 
+The folder “sender” is the web path that will control the Chromecast, sending messages.
+The folder “receiver” is the web app that will run on any device with Chromecast engine, it could not need the sender app, because sender is only useful on Chromecast devices.
+The folder “resources” is a shared path to sender and receiver app.
+
+/engine/engine-base.js
+/engine/engine-receiver.js
+/engine/engine-sender.js
+/resources/*
+/sender/index.html
+/receiver/receiver.html
