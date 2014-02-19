@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>ANG.CAST-SENDER</title>
+	<script type="text/javascript" src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js"></script>
+	<script type="text/javascript" src="../engine/engine-base.js"></script>
+  	<script type="text/javascript" src="../engine/engine-sender.js"></script>
+	<script>
+		
+		window.onload = function() {
+			loadEngine("E2D8E884");
+		}
+		
+	</script>
+</head>
+
+<body>
+	<!--CHROMECAST API --->
+	<label id="castLabel">Initializing Chromecast API</label>
+	<input id="castButton" hidden="true" type="button" value="Chromecast" onclick="onCastButtonConnectionClick()" />
+</body>
+
+</html>
