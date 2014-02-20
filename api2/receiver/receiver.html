@@ -1,0 +1,41 @@
+<html>
+<head>
+  	<title>ANG.CAST-RECEIVER</title>
+  	<script src="//www.gstatic.com/cast/sdk/libs/receiver/2.0.0/cast_receiver.js"></script>
+	<script type="text/javascript" src="../engine/engine-base.js"></script>
+  	<script type="text/javascript" src="../engine/engine-receiver.js"></script>
+  	<script type="text/javascript" src="../engine/engine-game.js"></script>
+	
+  	<script>
+		//debug flag
+		WEB_CHROME_CAST = true;
+		WEB_CHROME_PC = true;
+	
+    	window.onload = function() {
+					
+			//Load Engine
+			loadEngine('canvas-chromecast');
+			var json = loadTileMap('map');
+			var tilemap = new TileMap(json);
+			
+			load = function(){
+				tilemap.load();
+				add(tilemap);
+			}
+			
+			//On input 
+			input = function(){
+				if (KEY_NUMS.RIGHT in keysDown) { //RIGHT
+					tilemap.plusX(-15);
+				}
+				if (KEY_NUMS.LEFT in keysDown) { //LEFT
+					tilemap.plusX(15);
+				}
+			}
+    	}
+  	</script>
+</head>
+	<body style="background-color: black;">
+		<canvas id="canvas-chromecast" width="1280" height="720"/>
+	</body>
+</html>
