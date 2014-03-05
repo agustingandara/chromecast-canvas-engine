@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+  	<title>ANG.CAST-RECEIVER</title>
+  	<script src="//www.gstatic.com/cast/sdk/libs/receiver/2.0.0/cast_receiver.js"></script>
+	<script type="text/javascript" src="../engine/engine-base.js"></script>
+  	<script type="text/javascript" src="../engine/engine-receiver.js"></script>
+  	<script type="text/javascript" src="../engine/engine-game.js"></script>
+	
+  	<script>
+		//debug flag
+		WEB_CHROME_CAST = false;
+		WEB_CHROME_PC = true;
+		WEB_CHROME_MOBILE = true;
+	
+    	window.onload = function() {
+					
+			//Load Engine
+			this.loadEngine('canvas-chromecast');
+			
+			var json = loadTileMap('map');
+			this.tilemap = new TileMap(json);
+			
+			this.load = function(){
+				tilemap.load();
+				add(tilemap);
+				this.maincharacter = this.tilemap.subelements[2].subelements[0];
+			}
+			
+			//jump
+			this.jumpstate = false;
+			this.jump = 0;
+			
+			//On input 
+			this.input = function(){
+				if (KEY_NUMS.RIGHT in keysDown) { //RIGHT
+					
+					if(!tryIntersect(this.maincharacter, 8, 0, this.maincharacter.floor)){
+						this.maincharacter.x += 8;
+						this.maincharacter.flipx = false;
+						if((this.canvas.width /2) < this.maincharacter.x)
+							this.tilemap.plusX(-8);
+					}
+					
+				}
+				if (KEY_NUMS.LEFT in keysDown) { //LEFT
+					
+					if(!tryIntersect(this.maincharacter, -8, 0, this.maincharacter.floor)){
+						if(this.maincharacter.x > 8)
+							this.maincharacter.x -= 8;
+						this.maincharacter.flipx = true;
+						if((this.canvas.width /2) < this.maincharacter.x)
+							this.tilemap.plusX(8);
+					}
+				}
+				if (KEY_NUMS.UP in keysDown) {	 //UP
+					
+					if(this.maincharacter.gravitylock)
+						this.jumpstate = true;
+				}
+			}
+			
+			
+			this.update = function(){
+			
+				if(this.jumpstate){
+					this.maincharacter.gravitylock = false;
+					this.maincharacter.gravitystopped = true;
+					this.jump++;
+					
+					if(!tryIntersect(this.maincharacter, 0, -20, this.maincharacter.floor) && this.jump < 14)
+						this.maincharacter.y -= 20;
+					else this.jumpstate = false;
+					
+				}else {
+					this.maincharacter.gravitystopped = false;
+					this.jump = 0;
+				}
+			}
+    	}
+  	</script>
+</head>
+	<body style="background-color: black;">
+		<canvas id="canvas-chromecast" width="1280" height="720"/>
+	</body>
+</html>
