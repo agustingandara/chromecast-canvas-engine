@@ -18,64 +18,66 @@
 			//Load Engine
 			this.loadEngine('canvas-chromecast');
 			
+			this.loadImage('mario-statics');
+			this.loadImage('mario-dinamic-left');
+			this.loadImage('mario-dinamic-right');
 			var json = loadTileMap('map');
 			this.tilemap = new TileMap(json);
 			
 			this.load = function(){
-				tilemap.load();
-				add(tilemap);
-				this.maincharacter = this.tilemap.subelements[2].subelements[0];
+				this.tilemap.load();
+				this.add(this.tilemap);
+				
+				this.maincharacter = new MainCharacter(100, 100, this.tilemap.subelements[1]);
+				
+				this.maincharacter.stand_left = new ImageSplitElement('mario-statics', 0, 0, 4, 1, 3, 0);
+				this.maincharacter.stand_right = new ImageSplitElement('mario-statics', 0, 0, 4, 1, 2, 0);
+				this.maincharacter.walk_left = new SpriteElement('mario-dinamic-left', 0, 0, 3)
+				this.maincharacter.walk_right = new SpriteElement('mario-dinamic-right', 0, 0, 3)
+				this.maincharacter.up_left = new ImageSplitElement('mario-statics', 0, 0, 4, 1, 1, 0);
+				this.maincharacter.up_right= new ImageSplitElement('mario-statics', 0, 0, 4, 1, 0, 0);
+				
+				this.maincharacter.add(this.maincharacter.stand_left);
+				this.maincharacter.add(this.maincharacter.stand_right);
+				this.maincharacter.add(this.maincharacter.up_left);
+				this.maincharacter.add(this.maincharacter.up_right);
+				this.maincharacter.add(this.maincharacter.walk_left);
+				this.maincharacter.add(this.maincharacter.walk_right);
+				
+				this.tilemap.add(this.maincharacter);
 			}
-			
-			//jump
-			this.jumpstate = false;
-			this.jump = 0;
 			
 			//On input 
 			this.input = function(){
 				if (KEY_NUMS.RIGHT in keysDown) { //RIGHT
 					
 					if(!tryIntersect(this.maincharacter, 8, 0, this.maincharacter.floor)){
-						this.maincharacter.x += 8;
-						this.maincharacter.flipx = false;
-						if((this.canvas.width /2) < this.maincharacter.x)
-							this.tilemap.plusX(-8);
+									 
+						this.maincharacter.plusX(8);
+						
+						if((this.canvas.width /2) < this.maincharacter.getX()) this.tilemap.plusX(-8);
 					}
 					
 				}
 				if (KEY_NUMS.LEFT in keysDown) { //LEFT
 					
 					if(!tryIntersect(this.maincharacter, -8, 0, this.maincharacter.floor)){
-						if(this.maincharacter.x > 8)
-							this.maincharacter.x -= 8;
-						this.maincharacter.flipx = true;
-						if((this.canvas.width /2) < this.maincharacter.x)
-							this.tilemap.plusX(8);
+						
+						if(this.maincharacter.getX() > 8) this.maincharacter.plusX(-8);
+						
+						if((this.canvas.width /2) < this.maincharacter.getX()) this.tilemap.plusX(8);
 					}
 				}
 				if (KEY_NUMS.UP in keysDown) {	 //UP
 					
 					if(this.maincharacter.gravitylock)
-						this.jumpstate = true;
+						this.maincharacter.jumpstate = true;
 				}
 			}
 			
 			
 			this.update = function(){
 			
-				if(this.jumpstate){
-					this.maincharacter.gravitylock = false;
-					this.maincharacter.gravitystopped = true;
-					this.jump++;
-					
-					if(!tryIntersect(this.maincharacter, 0, -20, this.maincharacter.floor) && this.jump < 14)
-						this.maincharacter.y -= 20;
-					else this.jumpstate = false;
-					
-				}else {
-					this.maincharacter.gravitystopped = false;
-					this.jump = 0;
-				}
 			}
     	}
   	</script>
