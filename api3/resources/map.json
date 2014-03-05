@@ -1,4 +1,4 @@
-{ "backgroundcolor":"#5c9efc",
+{ "backgroundcolor":"#4597fb",
  "height":15,
  "layers":[
         {
@@ -668,32 +668,6 @@
                  "width":48,
                  "x":9504,
                  "y":576
-                }],
-         "opacity":1,
-         "type":"objectgroup",
-         "visible":true,
-         "width":224,
-         "x":0,
-         "y":0
-        }, 
-        {
-         "height":15,
-         "name":"character",
-         "objects":[
-                {
-                 "gid":30,
-                 "height":0,
-                 "name":"mario",
-                 "properties":
-                    {
-                     "floorlayer":"collition",
-                     "gravity":"10"
-                    },
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":144,
-                 "y":432
                 }],
          "opacity":1,
          "type":"objectgroup",

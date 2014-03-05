@@ -716,9 +716,9 @@ function Element(_x, _y, _param1, _param2, _color, _type){
 				elements.splice(index, 1);
 			}
 		}else{ 
-			var index = this.parent.subelements.indexOf(this);
-			if (index > -1) {
-				this.parent.subelements.splice(index, 1);
+			var innd = this.parent.subelements.indexOf(this);
+			if (innd > -1) {
+				this.parent.subelements.splice(innd, 1);
 			}
 		}
 	};
@@ -735,11 +735,11 @@ function Element(_x, _y, _param1, _param2, _color, _type){
 		
 		context.beginPath();
 		if(this.type == ELEMENT_TYPE.RECT){
-			context.rect(_x + this.x, _y + this.y, _x + this.dx, _y + this.dy);
+			context.rect(_x + this.x, _y + this.y, this.dx, this.dy);
 			context.fillStyle = this.color;
 			context.fill();
 		}else if(this.type == ELEMENT_TYPE.RELN){
-			context.rect(_x + this.x, _y + this.y, _x + this.dx, _y + this.dy);
+			context.rect(_x + this.x, _y + this.y, this.dx, this.dy);
 			context.fillStyle = this.color;
 			context.fill();
 			context.lineWidth = this.dz;

@@ -4,6 +4,167 @@
 /* TILE COMPATIBLE: TILE - POLYLINE - RECT - CIRCLE */
 /* SOON: SOLID POLYLINE */
 
+function MainCharacter(_x, _y, collition){
+	//indexing
+	this.parent = null;
+	this.x = _x;
+	this.y = _y;
+	this.z = 0;
+	
+	//private
+	this.type = ELEMENT_TYPE.GRUP;
+	this.subelements = [];
+	this._visible = true;
+	this.areaw = 0;
+	this.areah = 0;
+	
+    this.tickCount = 0;
+	this.ticksPerFrame = 1;
+	
+	//CHARACTER
+	
+	this.setVisibilitySubElementsToFalse = function () {
+		for (key in this.subelements) {
+			if(this.subelements[key]._visible){
+				this.subelements[key]._visible = false;
+			}
+		}
+    };
+	
+	this.stand_left = null;
+	this.stand_right = null;
+	//this.maincharacter.shot_left = null;
+	//this.maincharacter.shot_right = null;
+	this.walk_left = null;
+	this.walk_right = null;
+	this.up_left = null;
+	this.up_right = null;
+	//this.maincharacter.down_left = null;
+	//this.maincharacter.down_right = null;
+	
+	//CHARACTER
+	
+	//PHYSICS - PHYSICS - PHYSICS - PHYSICS - PHYSICS - PHYSICS - PHYSICS - PHYSICS - PHYSICS - PHYSICS - PHYSICS - PHYSICS
+	this.floor = collition;
+	this.gravity = 10;
+	this.gravitylock = false;
+	this.gravitystopped = false;
+	//jump
+	this.jumpstate = false;
+	this.jump = 0;
+	//position
+	this.walking = false;
+	this.directionview = false; //false left - true right
+	//PHYSICS - PHYSICS - PHYSICS - PHYSICS - PHYSICS - PHYSICS - PHYSICS - PHYSICS - PHYSICS - PHYSICS - PHYSICS - PHYSICS
+	
+	this.setX = function(param){this.x = param;};
+	this.setY = function(param){this.y = param;};
+	this.getX = function(){ return this.x;};
+	this.getY = function(){ return this.y;};
+	this.plusX = function(param){
+		this.x += param; 
+		this.directionview = param > 0 ? true : false; 
+		this.walking = true;
+	};
+	this.plusY = function(param){this.y += param;};
+	
+	this.setZ = function(_z){
+		this.z = _z;
+		if(this.parent !== null) this.parent.subelements.sort(function(a, b){return a.z-b.z; });
+		else elements.sort(function(a, b){return a.z-b.z; });
+	};
+	
+	this.add = function(element){
+		addCustom(element, this.subelements);
+	};
+	
+	this.update = function(){
+		
+		this.tickCount += 1;
+		//sprite animation
+		if (this.tickCount > this.ticksPerFrame) {
+			this.tickCount = 0;
+			
+			//PHYSICS - PHYSICS - PHYSICS - PHYSICS - PHYSICS - PHYSICS - PHYSICS - PHYSICS - PHYSICS - PHYSICS - PHYSICS - PHYSICS
+			if(this.gravity!==0 && this.floor !==null){
+				
+				if(this.jumpstate){
+					this.gravitylock = false;
+					this.gravitystopped = true;
+					this.jump++;
+					
+					if(!tryIntersect(this, 0, -20, this.floor) && this.jump < 14)
+						this.y -= 20;
+					else this.jumpstate = false;
+					
+				}else {
+					this.gravitystopped = false;
+					this.jump = 0;
+				}
+
+				if(!this.gravitystopped){
+					var moved = false;
+					for(var i = this.gravity*2 ; i > 0 && !moved ; i--){
+						if(!tryIntersect(this, 0, i, this.floor)){ 
+							this.gravitylock = false;
+							this.y += i;
+							moved = true;
+						}else this.gravitylock = true;
+					}
+				}
+			}
+			//PHYSICS - PHYSICS - PHYSICS - PHYSICS - PHYSICS - PHYSICS - PHYSICS - PHYSICS - PHYSICS - PHYSICS - PHYSICS - PHYSICS
+		}
+		
+		this.setVisibilitySubElementsToFalse();
+		if(this.directionview && !this.jumpstate && !this.walking) this.stand_left.setVisibility(true);
+		else if(!this.directionview && !this.jumpstate && !this.walking) this.stand_right.setVisibility(true);
+		else if(this.directionview && this.jumpstate) this.up_left.setVisibility(true);
+		else if(!this.directionview && this.jumpstate) this.up_right.setVisibility(true);
+		else if(this.directionview && this.walking) { this.walk_left.setVisibility(true); this.walking = false;}
+		else if(!this.directionview && this.walking) { this.walk_right.setVisibility(true); this.walking = false;}
+		
+		for (key in this.subelements) {
+			if(this.subelements[key]._visible){
+				this.subelements[key].update();
+			}
+		}
+	};
+	
+	this.render = function(_x, _y){
+		for (key in this.subelements) {
+			if(this.subelements[key]._visible){
+				this.subelements[key].render(_x + this.x, _y + this.y);
+			}
+		}
+	};
+	
+	this.remove = function(){
+		for (key in this.subelements) {
+			this.subelements[key].remove();
+		}
+		if(this.parent === null){
+			var index = elements.indexOf(this);			
+			if (index > -1) {
+				elements.splice(index, 1);
+			}
+		}else{
+			var index = this.subelements.indexOf(this);			
+			if (index > -1) {
+				this.subelements.splice(index, 1);
+			}
+		}
+	};
+	
+	this.setVisibility = function (visibility) {
+		this._visible = visibility;
+    };
+	
+	this.intersectavailable = function(){
+		return this._visible;
+	};
+}
+
 function createImageTileMap(tilemap, id, x, y){
 
 	if(tilemap.tilesets !== undefined) {
@@ -139,7 +300,7 @@ function TileMap(_tilemap){
 										for (layernum in this.subelements){
 											if(this.subelements[layernum].layerTileMap.name === layer.objects[object].properties.floorlayer){
 												box.element.floor = this.subelements[layernum];
-												box.element.update = function () {
+												box.element.update = function () {	//overwrite update method
 													this.tickCount += 1;
 													//sprite animation
 													if (this.tickCount > this.ticksPerFrame) {
@@ -167,10 +328,8 @@ function TileMap(_tilemap){
 												}; 
 												
 												//PHYSICS - PHYSICS - PHYSICS - PHYSICS - PHYSICS - PHYSICS - PHYSICS - PHYSICS - PHYSICS - PHYSICS - PHYSICS - PHYSICS
-												//box.element.gravity = 0;
 												box.element.gravitylock = false;
 												box.element.gravitystopped = false;
-												//this.floor = null;
 												//PHYSICS - PHYSICS - PHYSICS - PHYSICS - PHYSICS - PHYSICS - PHYSICS - PHYSICS - PHYSICS - PHYSICS - PHYSICS - PHYSICS
 												break;
 											}
